@@ -7,10 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CE622AB91D5876D6004C66F6 /* ZXMaskTipView.h in Headers */ = {isa = PBXBuildFile; fileRef = CE622AB81D5876D6004C66F6 /* ZXMaskTipView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE622AC01D5876D6004C66F6 /* ZXMaskTipView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE622AB51D5876D6004C66F6 /* ZXMaskTipView.framework */; };
 		CE622AC51D5876D6004C66F6 /* ZXMaskTipViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CE622AC41D5876D6004C66F6 /* ZXMaskTipViewTests.m */; };
 		CE622AD01D587781004C66F6 /* AMPopTip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE622ACF1D587781004C66F6 /* AMPopTip.framework */; };
+		CE622AD61D5879E7004C66F6 /* ZXMaskTipObj.h in Headers */ = {isa = PBXBuildFile; fileRef = CE622AD21D5879E7004C66F6 /* ZXMaskTipObj.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE622AD71D5879E7004C66F6 /* ZXMaskTipObj.m in Sources */ = {isa = PBXBuildFile; fileRef = CE622AD31D5879E7004C66F6 /* ZXMaskTipObj.m */; };
+		CE622AD81D5879E7004C66F6 /* ZXMaskTipView.h in Headers */ = {isa = PBXBuildFile; fileRef = CE622AD41D5879E7004C66F6 /* ZXMaskTipView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE622AD91D5879E7004C66F6 /* ZXMaskTipView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE622AD51D5879E7004C66F6 /* ZXMaskTipView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,12 +28,15 @@
 
 /* Begin PBXFileReference section */
 		CE622AB51D5876D6004C66F6 /* ZXMaskTipView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZXMaskTipView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		CE622AB81D5876D6004C66F6 /* ZXMaskTipView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZXMaskTipView.h; sourceTree = "<group>"; };
 		CE622ABA1D5876D6004C66F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE622ABF1D5876D6004C66F6 /* ZXMaskTipViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZXMaskTipViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE622AC41D5876D6004C66F6 /* ZXMaskTipViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZXMaskTipViewTests.m; sourceTree = "<group>"; };
 		CE622AC61D5876D6004C66F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE622ACF1D587781004C66F6 /* AMPopTip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AMPopTip.framework; path = Carthage/Build/iOS/AMPopTip.framework; sourceTree = "<group>"; };
+		CE622AD21D5879E7004C66F6 /* ZXMaskTipObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXMaskTipObj.h; sourceTree = "<group>"; };
+		CE622AD31D5879E7004C66F6 /* ZXMaskTipObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZXMaskTipObj.m; sourceTree = "<group>"; };
+		CE622AD41D5879E7004C66F6 /* ZXMaskTipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXMaskTipView.h; sourceTree = "<group>"; };
+		CE622AD51D5879E7004C66F6 /* ZXMaskTipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZXMaskTipView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,7 +81,10 @@
 		CE622AB71D5876D6004C66F6 /* ZXMaskTipView */ = {
 			isa = PBXGroup;
 			children = (
-				CE622AB81D5876D6004C66F6 /* ZXMaskTipView.h */,
+				CE622AD21D5879E7004C66F6 /* ZXMaskTipObj.h */,
+				CE622AD31D5879E7004C66F6 /* ZXMaskTipObj.m */,
+				CE622AD41D5879E7004C66F6 /* ZXMaskTipView.h */,
+				CE622AD51D5879E7004C66F6 /* ZXMaskTipView.m */,
 				CE622ABA1D5876D6004C66F6 /* Info.plist */,
 			);
 			path = ZXMaskTipView;
@@ -105,7 +114,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE622AB91D5876D6004C66F6 /* ZXMaskTipView.h in Headers */,
+				CE622AD61D5879E7004C66F6 /* ZXMaskTipObj.h in Headers */,
+				CE622AD81D5879E7004C66F6 /* ZXMaskTipView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -205,6 +215,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE622AD91D5879E7004C66F6 /* ZXMaskTipView.m in Sources */,
+				CE622AD71D5879E7004C66F6 /* ZXMaskTipObj.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
