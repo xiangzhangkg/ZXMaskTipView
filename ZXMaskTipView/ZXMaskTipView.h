@@ -17,7 +17,7 @@
 @property (nonatomic, strong, nonnull) UIColor *tipColor UI_APPEARANCE_SELECTOR;
 @property (nonatomic, strong, nonnull) UIFont *tipFont UI_APPEARANCE_SELECTOR;
 
-#pragma mark - Convenience Init
+#pragma mark - Blend mode init
 
 /**
  *  show mask for blend mode
@@ -41,7 +41,42 @@
                 andIdentifierArr:(NSArray <NSString *> *_Nonnull)aIdentifierArr
                        andTipArr:(NSArray <NSString *> *_Nonnull)aTipArr;
 
-#pragma mark - Init
+#pragma mark - Cover mode init
+
+/**
+ *  show mask for cover mode
+ *
+ *  @param aView       action view
+ *  @param aIdentifier identifier
+ *  @param aTip        tip
+ */
++ (void)showCoverMaskWithView:(UIView *_Nonnull)aView
+                andIdentifier:(NSString *_Nonnull)aIdentifier
+                       andTip:(NSString *_Nonnull)aTip;
+
+/**
+ *  show mask for cover mode
+ *
+ *  @param aViewArr       action view array
+ *  @param aIdentifierArr identifier array
+ *  @param aTipArr        tip array
+ */
++ (void)showCoverMaskWithViewArr:(NSArray <UIView *> *_Nonnull)aViewArr
+                andIdentifierArr:(NSArray <NSString *> *_Nonnull)aIdentifierArr
+                       andTipArr:(NSArray <NSString *> *_Nonnull)aTipArr;
+
+#pragma mark - Page mode init
+
+/**
+ *  show mask for page mode
+ *
+ *  @param aIdentifier identifier
+ *  @param aTip        tip
+ */
++ (void)showPageMaskWithIdentifier:(NSString *_Nonnull)aIdentifier
+                            andTip:(NSString *_Nonnull)aTip;
+
+#pragma mark - Custom mode init
 
 /**
  *  show mask
@@ -56,16 +91,5 @@
  *  @param aMaskTipArr ZXMaskTipObj array
  */
 + (void)showMaskWithMaskTipObjArr:(NSArray <ZXMaskTipObj *> *_Nonnull)aMaskTipArr;
-
-#pragma mark - Page mode init
-
-/**
- *  show mask for page mode
- *
- *  @param aIdentifier identifier
- *  @param aTip        tip
- */
-+ (void)showPageMaskWithIdentifier:(NSString *_Nonnull)aIdentifier
-                            andTip:(NSString *_Nonnull)aTip;
 
 @end

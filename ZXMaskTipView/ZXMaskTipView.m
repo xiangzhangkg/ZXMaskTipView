@@ -25,8 +25,10 @@
 static NSMutableDictionary *cacheDic = nil;
 
 @interface ZXMaskTipView () {
-    ZXMaskTipObj *_currentMaskTipObj; // draw one by one, this is current obj
-    BOOL _currentIsPage; // current obj is page mode
+    // draw one by one, this is current obj
+    ZXMaskTipObj *_currentMaskTipObj;
+    // current obj is page mode
+    BOOL _currentIsPage;
     NSArray <ZXMaskTipObj *> *_maskTipObjArr;
     AMPopTip *_popTip;
     __weak UIWindow *_window;
@@ -70,6 +72,45 @@ static NSMutableDictionary *cacheDic = nil;
         maskTipObj.identifier = aIdentifierArr[i];
         maskTipObj.tip = aTipArr[i];
         maskTipObj.type = ZXMaskTipType_Blend;
+        [maskTipObjArr addObject:maskTipObj];
+    }
+    [self showMaskWithMaskTipObjArr:[NSArray arrayWithArray:maskTipObjArr]];
+}
+
+#pragma mark - Cover mode init
+
+/**
+ *  show mask for cover mode
+ *
+ *  @param aView       action view
+ *  @param aIdentifier identifier
+ *  @param aTip        tip
+ */
++ (void)showCoverMaskWithView:(UIView *_Nonnull)aView
+                andIdentifier:(NSString *_Nonnull)aIdentifier
+                       andTip:(NSString *_Nonnull)aTip {
+    [self showCoverMaskWithViewArr:@[aView] andIdentifierArr:@[aIdentifier] andTipArr:@[aTip]];
+}
+
+/**
+ *  show mask for cover mode
+ *
+ *  @param aViewArr       action view array
+ *  @param aIdentifierArr identifier array
+ *  @param aTipArr        tip array
+ */
++ (void)showCoverMaskWithViewArr:(NSArray <UIView *> *_Nonnull)aViewArr
+                andIdentifierArr:(NSArray <NSString *> *_Nonnull)aIdentifierArr
+                       andTipArr:(NSArray <NSString *> *_Nonnull)aTipArr {
+    NSAssert(aViewArr.count == aIdentifierArr.count, @"aViewArr.count must be equal to aIdentifierArr.count");
+    NSAssert(aViewArr.count == aTipArr.count, @"aViewArr.count must be equal to aTipArr.count");
+    NSMutableArray <ZXMaskTipObj *> *maskTipObjArr = [[NSMutableArray alloc] init];
+    for (int i = 0; i < aViewArr.count; i++) {
+        ZXMaskTipObj *maskTipObj = [[ZXMaskTipObj alloc] init];
+        maskTipObj.view = aViewArr[i];
+        maskTipObj.identifier = aIdentifierArr[i];
+        maskTipObj.tip = aTipArr[i];
+        maskTipObj.type = ZXMaskTipType_Cover;
         [maskTipObjArr addObject:maskTipObj];
     }
     [self showMaskWithMaskTipObjArr:[NSArray arrayWithArray:maskTipObjArr]];
@@ -219,6 +260,7 @@ static NSMutableDictionary *cacheDic = nil;
     }
     if (!_currentIsPage) {
         __weak __typeof(self) wSelf = self;
+        
         _popTip.tapHandler = ^{
             [wSelf dismissMaskTipView];
         };
@@ -226,11 +268,36 @@ static NSMutableDictionary *cacheDic = nil;
 }
 
 /**
+ *  duplicate view
+ *
+ *  @param aView origin view
+ *
+ *  @return new view
+ */
+- (UIView *)duplicateView:(UIView *)aView {
+    // TODO: Survey reason. can not use archiver, because reset the duplicated view's frame will have no effect, the origin always be {0, 0}
+    //    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:aView];
+    //    return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
+    return [aView snapshotViewAfterScreenUpdates:NO];
+}
+
+/**
+ *  add cover view
+ */
+- (void)addCoverView {
+    UIView *coverView = [self duplicateView:_currentMaskTipObj.view];
+    coverView.frame = _currentMaskTipObj.frame;
+    coverView.userInteractionEnabled = NO;
+    [self addSubview:coverView];
+}
+
+/**
  *  add close when page mode
  */
 - (void)addCloseBtnOnPageMask {
     UIButton *closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    closeBtn.frame = CGRectMake(CGRectGetWidth(_popTip.frame) -12.f - 15.f, 10.f, 15.f, 15.f);
+    closeBtn.frame = CGRectMake(CGRectGetWidth(_popTip.frame) - 12.f - 15.f, 10.f, 15.f, 15.f);
     [closeBtn setTitle:@"X" forState:UIControlStateNormal];
     [closeBtn addTarget:self action:@selector(dismissMaskTipView) forControlEvents:UIControlEventTouchUpInside];
     [_popTip addSubview:closeBtn];
@@ -238,17 +305,15 @@ static NSMutableDictionary *cacheDic = nil;
 
 /**
  *  show pop tip
- *
- *  @param aMaskTipObj ZXMaskTipObj
  */
-- (void)showPopTipWithMaskTipObj:(ZXMaskTipObj *)aMaskTipObj {
-    CGRect frame = aMaskTipObj.frame;
+- (void)showPopTipWithMaskTipObj {
+    CGRect frame = _currentMaskTipObj.frame;
     CGFloat maxWidth;
     AMPopTipDirection direction;
     if (_currentIsPage) {
         // FIXME: a 3rdparty bug, can not place pop and text in center when maxWidth is window width
         maxWidth = CGRectGetWidth(_window.frame) - 64.f;
-//        maxWidth = CGRectGetWidth(_window.frame);
+        //        maxWidth = CGRectGetWidth(_window.frame);
         direction = AMPopTipDirectionUp;
         _popTip.offset = -8.f;
         _popTip.edgeInsets = UIEdgeInsetsMake(15.f, 32.f, 15.f, 32.f);
@@ -274,10 +339,10 @@ static NSMutableDictionary *cacheDic = nil;
         }
         _popTip.offset = 10.f;
     }
-    _popTip.popoverColor = aMaskTipObj.tipBgColor ? aMaskTipObj.tipBgColor : _tipBgColor;
-    _popTip.textColor = aMaskTipObj.tipColor ? aMaskTipObj.tipColor : _tipColor;
-    _popTip.font = aMaskTipObj.tipFont ? aMaskTipObj.tipFont : _tipFont;
-    [_popTip showText:aMaskTipObj.tip direction:direction maxWidth:maxWidth inView:self fromFrame:frame];
+    _popTip.popoverColor = _currentMaskTipObj.tipBgColor ? _currentMaskTipObj.tipBgColor : _tipBgColor;
+    _popTip.textColor = _currentMaskTipObj.tipColor ? _currentMaskTipObj.tipColor : _tipColor;
+    _popTip.font = _currentMaskTipObj.tipFont ? _currentMaskTipObj.tipFont : _tipFont;
+    [_popTip showText:_currentMaskTipObj.tip direction:direction maxWidth:maxWidth inView:self fromFrame:frame];
 }
 
 /**
@@ -291,7 +356,7 @@ static NSMutableDictionary *cacheDic = nil;
 
 - (void)drawRect:(CGRect)rect {
     // need call show pop first, because close btn need pop's frame
-    [self showPopTipWithMaskTipObj:_currentMaskTipObj];
+    [self showPopTipWithMaskTipObj];
     
     // draw mask
     [_maskColor setFill];
@@ -299,7 +364,7 @@ static NSMutableDictionary *cacheDic = nil;
     
     // draw one by one
     switch (_currentMaskTipObj.type) {
-        // draw blend view
+            // draw blend view
         case ZXMaskTipType_Blend: {
             CGRect intersectionRect = CGRectIntersection(_currentMaskTipObj.frame, self.frame);
             UIColor *blendColor = [UIColor clearColor];
@@ -315,13 +380,13 @@ static NSMutableDictionary *cacheDic = nil;
         }
             
         case ZXMaskTipType_Cover: {
+            [self addCoverView];
             
             break;
         }
             
         case ZXMaskTipType_Page: {
             [self addCloseBtnOnPageMask];
-            
             
             break;
         }
