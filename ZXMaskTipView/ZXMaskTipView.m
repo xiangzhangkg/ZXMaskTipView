@@ -175,6 +175,40 @@ static NSMutableDictionary *cacheDic = nil;
     }
 }
 
+#pragma mark - Clear cache
+
+/**
+ *  clear cache for one identifier
+ *
+ *  @param aIdentifier identifier
+ */
++ (void)clearCacheWithIdentifier:(NSString *_Nonnull)aIdentifier {
+    NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:kZXMaskTipViewShowCachePath];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:path]) {
+        NSMutableDictionary *cacheDicTemp = [[NSMutableDictionary alloc] initWithContentsOfFile:path];
+        [cacheDicTemp setObject:@(NO) forKey:aIdentifier];
+        [cacheDicTemp writeToFile:path atomically:YES];
+        cacheDic = cacheDicTemp;
+    }
+}
+
+/**
+ *  clear cache
+ */
++ (void)clearAllCache {
+    NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:kZXMaskTipViewShowCachePath];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:path]) {
+        NSMutableDictionary *cacheDicTemp = [[NSMutableDictionary alloc] initWithContentsOfFile:path];
+        for (NSString *aIdentifier in cacheDicTemp.allKeys) {
+            [cacheDicTemp setObject:@(NO) forKey:aIdentifier];
+        }
+        [cacheDicTemp writeToFile:path atomically:YES];
+        cacheDic = cacheDicTemp;
+    }
+}
+
 #pragma mark - Private class method
 
 /**

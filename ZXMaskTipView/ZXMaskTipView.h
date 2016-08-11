@@ -97,4 +97,18 @@
  */
 + (void)dismissMaskTipView;
 
+#pragma mark - Clear cache
+
+/**
+ *  clear cache for one identifier
+ *
+ *  @param aIdentifier identifier
+ */
++ (void)clearCacheWithIdentifier:(NSString *_Nonnull)aIdentifier;
+
+/**
+ *  clear cache
+ */
++ (void)clearAllCache;
+
 @end
