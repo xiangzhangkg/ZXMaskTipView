@@ -68,7 +68,7 @@
 #pragma mark - Page mode init
 
 /**
- *  show mask for page mode
+ *  show mask for page mode, need call dismiss method
  *
  *  @param aIdentifier identifier
  *  @param aTip        tip
@@ -91,5 +91,10 @@
  *  @param aMaskTipArr ZXMaskTipObj array
  */
 + (void)showMaskWithMaskTipObjArr:(NSArray <ZXMaskTipObj *> *_Nonnull)aMaskTipArr;
+
+/**
+ *  dismiss mask, will not mark has read
+ */
++ (void)dismissMaskTipView;
 
 @end

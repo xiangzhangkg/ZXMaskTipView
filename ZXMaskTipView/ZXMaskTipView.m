@@ -162,6 +162,19 @@ static NSMutableDictionary *cacheDic = nil;
     }
 }
 
+/**
+ *  dismiss mask, will not mark has read
+ */
++ (void)dismissMaskTipView {
+    __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
+    for (UIView *aSubView in window.subviews) {
+        if ([aSubView isKindOfClass:[ZXMaskTipView class]]) {
+            ZXMaskTipView *maskTipView = (ZXMaskTipView *)aSubView;
+            [maskTipView dismissMaskTipViewWithNeedCache:NO];
+        }
+    }
+}
+
 #pragma mark - Private class method
 
 /**
@@ -257,12 +270,11 @@ static NSMutableDictionary *cacheDic = nil;
     _popTip.actionAnimation = _currentIsPage ? AMPopTipActionAnimationNone : AMPopTipActionAnimationBounce;
     if (_currentIsPage) {
         _popTip.radius = 0.f;
-    }
-    if (!_currentIsPage) {
+    } else {
         __weak __typeof(self) wSelf = self;
         
         _popTip.tapHandler = ^{
-            [wSelf dismissMaskTipView];
+            [wSelf dismissMaskTipViewWithNeedCache:YES];
         };
     }
 }
@@ -299,7 +311,7 @@ static NSMutableDictionary *cacheDic = nil;
     UIButton *closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     closeBtn.frame = CGRectMake(CGRectGetWidth(_popTip.frame) - 12.f - 15.f, 10.f, 15.f, 15.f);
     [closeBtn setTitle:@"X" forState:UIControlStateNormal];
-    [closeBtn addTarget:self action:@selector(dismissMaskTipView) forControlEvents:UIControlEventTouchUpInside];
+    [closeBtn addTarget:self action:@selector(closeBtnAction:) forControlEvents:UIControlEventTouchUpInside];
     [_popTip addSubview:closeBtn];
 }
 
@@ -347,11 +359,26 @@ static NSMutableDictionary *cacheDic = nil;
 
 /**
  *  dismiss mask
+ *
+ *  @param aNeedCache need cache
  */
-- (void)dismissMaskTipView {
-    [self.class setCacheDicWithMaskTipObj:_currentMaskTipObj];
+- (void)dismissMaskTipViewWithNeedCache:(BOOL)aNeedCache {
+    if (aNeedCache) {
+        [self.class setCacheDicWithMaskTipObj:_currentMaskTipObj];
+    }
     [_popTip hide];
     [self removeFromSuperview];
+}
+
+#pragma mark - Action
+
+/**
+ *  close
+ *
+ *  @param sender btn
+ */
+- (void)closeBtnAction:(id)sender {
+    [self dismissMaskTipViewWithNeedCache:YES];
 }
 
 - (void)drawRect:(CGRect)rect {
@@ -399,8 +426,10 @@ static NSMutableDictionary *cacheDic = nil;
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     UIView *resultView = [super hitTest:point withEvent:event];
     if (resultView == self) {
-        if (!_currentIsPage) {
-            [self dismissMaskTipView];
+        if (_currentIsPage) {
+            return nil;
+        } else {
+            [self dismissMaskTipViewWithNeedCache:YES];
             for (ZXMaskTipObj *aMaskTipObj in _maskTipObjArr) {
                 if (CGRectContainsPoint(aMaskTipObj.frame, point)) {
                     return aMaskTipObj.view;
