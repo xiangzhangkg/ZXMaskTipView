@@ -10,13 +10,13 @@
 #import "ZXMaskTipObj.h"
 #import <AMPopTip/AMPopTip.h>
 
-#define kZXMaskTipViewMaskColorDefault          [[UIColor blackColor] colorWithAlphaComponent:.5f]
+#define kZXMaskTipViewMaskColorDefault          [[UIColor blackColor] colorWithAlphaComponent:.6f]
 #define kZXMaskTipViewTipBgColorDefault         [UIColor whiteColor]
-#define kZXMaskTipViewTipColorDefault           [UIColor blackColor]
+#define kZXMaskTipViewTipColorDefault           [UIColor colorWithRed:111.f / 255.f green:111.f / 255.f blue:111.f / 255.f alpha:1.f]
 #define kZXMaskTipViewTipFontDefault            [UIFont systemFontOfSize:14.f]
 
 #define kZXMaskTipViewMaskColorDefault_Page     [UIColor clearColor]
-#define kZXMaskTipViewTipBgColorDefault_Page    [[UIColor blackColor] colorWithAlphaComponent:.8f]
+#define kZXMaskTipViewTipBgColorDefault_Page    [[UIColor blackColor] colorWithAlphaComponent:.6f]
 #define kZXMaskTipViewTipColorDefault_Page      [UIColor whiteColor]
 #define kZXMaskTipViewTipFontDefault_Page       [UIFont systemFontOfSize:14.f]
 
@@ -149,16 +149,25 @@ static NSMutableDictionary *cacheDic = nil;
 /**
  *  show mask
  *
- *  @param aMaskTipArr ZXMaskTipObj array
+ *  @param aMaskTipObjArr ZXMaskTipObj array
  */
-+ (void)showMaskWithMaskTipObjArr:(NSArray <ZXMaskTipObj *> *_Nonnull)aMaskTipArr {
-    NSArray <ZXMaskTipObj *> *needShowMaskTipObjArr = [self filterForNeedShowMaskWithMaskTipObjArr:aMaskTipArr];
-    if (needShowMaskTipObjArr.count > 0) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
++ (void)showMaskWithMaskTipObjArr:(NSArray <ZXMaskTipObj *> *_Nonnull)aMaskTipObjArr {
+    NSArray <ZXMaskTipObj *> *needShowMaskTipObjArr = [self filterForNeedShowMaskWithMaskTipObjArr:aMaskTipObjArr];
+    if (needShowMaskTipObjArr.count > 0 && ![self isShowingWithMaskTipArr:needShowMaskTipObjArr]) {
+        ZXMaskTipObj *currentMaskTipObj = needShowMaskTipObjArr[0];
+        if (currentMaskTipObj.type == ZXMaskTipType_Page) {
+            // no need delay when page for not add repeat
             __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
             ZXMaskTipView *maskTipView = [[ZXMaskTipView alloc] initWithFrame:window.frame andMaskTipObjArr:needShowMaskTipObjArr];
             [window addSubview:maskTipView];
-        });
+        } else {
+            // need delay when cover for convert right frame
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
+                ZXMaskTipView *maskTipView = [[ZXMaskTipView alloc] initWithFrame:window.frame andMaskTipObjArr:needShowMaskTipObjArr];
+                [window addSubview:maskTipView];
+            });
+        }
     }
 }
 
@@ -259,6 +268,28 @@ static NSMutableDictionary *cacheDic = nil;
     [cacheDic writeToFile:path atomically:YES];
 }
 
+/**
+ *  check same mask is showing
+ *
+ *  @param aMaskTipObjArr ZXMaskTipObj array
+ *
+ *  @return is showing
+ */
++ (BOOL)isShowingWithMaskTipArr:(NSArray <ZXMaskTipObj *> *_Nonnull)aMaskTipObjArr {
+    ZXMaskTipObj *currentMaskTipObj = aMaskTipObjArr[0];
+    __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
+    for (UIView *aSubView in window.subviews) {
+        if ([aSubView isKindOfClass:[ZXMaskTipView class]]) {
+            ZXMaskTipView *maskTipView = (ZXMaskTipView *)aSubView;
+            if ([maskTipView->_currentMaskTipObj.identifier isEqualToString:currentMaskTipObj.identifier]) {
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
+}
+
 #pragma mark - Instance method
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -297,7 +328,6 @@ static NSMutableDictionary *cacheDic = nil;
     appearance.textColor = _tipColor;
     // view
     _popTip = [AMPopTip popTip];
-    _popTip.font = _tipFont;
     _popTip.shouldDismissOnTap = NO;
     _popTip.shouldDismissOnTapOutside = NO;
     _popTip.shouldDismissOnSwipeOutside = NO;
@@ -364,7 +394,7 @@ static NSMutableDictionary *cacheDic = nil;
         _popTip.offset = -8.f;
         _popTip.edgeInsets = UIEdgeInsetsMake(15.f, 32.f, 15.f, 32.f);
     } else {
-        maxWidth = CGRectGetWidth(_window.frame) / 2.f;
+        maxWidth = CGRectGetWidth(_window.frame) / 2.f - 14.f;
         CGFloat top = CGRectGetMinY(frame);
         CGFloat bottom = CGRectGetHeight(_window.frame) - CGRectGetMaxY(frame);
         CGFloat left = CGRectGetMinX(frame);
@@ -384,10 +414,12 @@ static NSMutableDictionary *cacheDic = nil;
             _popTip.bubbleOffset = 25.f;
         }
         _popTip.offset = 10.f;
+        _popTip.edgeInsets = UIEdgeInsetsMake(7.f, 7.f, 7.f, 7.f);
     }
     _popTip.popoverColor = _currentMaskTipObj.tipBgColor ? _currentMaskTipObj.tipBgColor : _tipBgColor;
     _popTip.textColor = _currentMaskTipObj.tipColor ? _currentMaskTipObj.tipColor : _tipColor;
     _popTip.font = _currentMaskTipObj.tipFont ? _currentMaskTipObj.tipFont : _tipFont;
+    _popTip.textAlignment = NSTextAlignmentLeft;
     [_popTip showText:_currentMaskTipObj.tip direction:direction maxWidth:maxWidth inView:self fromFrame:frame];
 }
 
