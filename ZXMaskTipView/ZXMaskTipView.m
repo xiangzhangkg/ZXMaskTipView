@@ -184,6 +184,27 @@ static NSMutableDictionary *cacheDic = nil;
     }
 }
 
+#pragma mark - Set cache
+
+/**
+ *  set cache showed for on identifier
+ *
+ *  @param aIdentifier identifier
+ */
++ (void)setCacheWithIdentifier:(NSString *_Nonnull)aIdentifier {
+    NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:kZXMaskTipViewShowCachePath];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (![fileManager fileExistsAtPath:path]) {
+        [fileManager createFileAtPath:path contents:nil attributes:nil];
+        NSMutableDictionary *emptyCacheDic = [[NSMutableDictionary alloc] init];
+        [emptyCacheDic writeToFile:path atomically:YES];
+    }
+    NSMutableDictionary *cacheDicTemp = [[NSMutableDictionary alloc] initWithContentsOfFile:path];
+    [cacheDicTemp setObject:@(YES) forKey:aIdentifier];
+    [cacheDicTemp writeToFile:path atomically:YES];
+    cacheDic = cacheDicTemp;
+}
+
 #pragma mark - Clear cache
 
 /**
@@ -415,6 +436,7 @@ static NSMutableDictionary *cacheDic = nil;
         }
         _popTip.offset = 10.f;
         _popTip.edgeInsets = UIEdgeInsetsMake(7.f, 7.f, 7.f, 7.f);
+        _popTip.edgeMargin = 10.f;
     }
     _popTip.popoverColor = _currentMaskTipObj.tipBgColor ? _currentMaskTipObj.tipBgColor : _tipBgColor;
     _popTip.textColor = _currentMaskTipObj.tipColor ? _currentMaskTipObj.tipColor : _tipColor;
