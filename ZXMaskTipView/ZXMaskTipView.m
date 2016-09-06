@@ -205,6 +205,26 @@ static NSMutableDictionary *cacheDic = nil;
     cacheDic = cacheDicTemp;
 }
 
+#pragma mark - Get cache
+
+/**
+ *  get cache is showed for on identifier
+ *
+ *  @param aIdentifier identifier
+ *
+ *  @return is showed
+ */
++ (BOOL)getCacheWithIdentifier:(NSString *_Nonnull)aIdentifier {
+    BOOL isShowed = NO;
+    NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:kZXMaskTipViewShowCachePath];
+    NSMutableDictionary *cacheDicTemp = [[NSMutableDictionary alloc] initWithContentsOfFile:path];
+    if (cacheDicTemp && cacheDicTemp[aIdentifier]) {
+        isShowed = [cacheDicTemp[aIdentifier] boolValue];
+    }
+    
+    return isShowed;
+}
+
 #pragma mark - Clear cache
 
 /**

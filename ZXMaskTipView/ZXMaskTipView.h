@@ -106,6 +106,17 @@
  */
 + (void)setCacheWithIdentifier:(NSString *_Nonnull)aIdentifier;
 
+#pragma mark - Get cache
+
+/**
+ *  get cache is showed for on identifier
+ *
+ *  @param aIdentifier identifier
+ *
+ *  @return is showed
+ */
++ (BOOL)getCacheWithIdentifier:(NSString *_Nonnull)aIdentifier;
+
 #pragma mark - Clear cache
 
 /**
