@@ -403,7 +403,7 @@ static NSMutableDictionary *cacheDic = nil;
  *  add cover view
  */
 - (void)addCoverView {
-    UIView *coverView = [self duplicateView:_currentMaskTipObj.view];
+    UIView *coverView = _currentMaskTipObj.coverView ? _currentMaskTipObj.coverView : [self duplicateView:_currentMaskTipObj.view];
     coverView.frame = _currentMaskTipObj.frame;
     coverView.userInteractionEnabled = NO;
     [self addSubview:coverView];
@@ -443,20 +443,20 @@ static NSMutableDictionary *cacheDic = nil;
         CGFloat max = MAX(MAX(top, bottom), MAX(left, right));
         if (max == top) {
             direction = AMPopTipDirectionUp;
-            _popTip.bubbleOffset = -25.f;
+//            _popTip.bubbleOffset = -25.f;
         } else if (max == bottom) {
             direction = AMPopTipDirectionDown;
-            _popTip.bubbleOffset = 25.f;
+//            _popTip.bubbleOffset = 25.f;
         } else if (max == left) {
             direction = AMPopTipDirectionLeft;
-            _popTip.bubbleOffset = -25.f;
+//            _popTip.bubbleOffset = -25.f;
         } else if (max == right) {
             direction = AMPopTipDirectionRight;
-            _popTip.bubbleOffset = 25.f;
+//            _popTip.bubbleOffset = 25.f;
         }
         _popTip.offset = 10.f;
         _popTip.edgeInsets = UIEdgeInsetsMake(7.f, 7.f, 7.f, 7.f);
-        _popTip.edgeMargin = 10.f;
+        _popTip.edgeMargin = 5.f;
     }
     _popTip.popoverColor = _currentMaskTipObj.tipBgColor ? _currentMaskTipObj.tipBgColor : _tipBgColor;
     _popTip.textColor = _currentMaskTipObj.tipColor ? _currentMaskTipObj.tipColor : _tipColor;

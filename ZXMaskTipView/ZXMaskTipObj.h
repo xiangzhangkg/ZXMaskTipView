@@ -26,6 +26,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) UIView *view;
 // optional
 @property (nonatomic, assign) ZXMaskTipType type;
+// customize coverView different from view when SkyMaskTipType_Cover if necessary
+@property (nonatomic, strong) UIView *coverView;
 @property (nonatomic, assign) CGRect frame;
 @property (nonatomic, assign) CGFloat cornerRadius;
 @property (nonatomic, strong) UIColor *maskColor;
