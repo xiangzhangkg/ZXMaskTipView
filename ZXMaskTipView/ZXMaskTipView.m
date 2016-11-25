@@ -21,6 +21,8 @@
 #define kZXMaskTipViewTipFontDefault_Page       [UIFont systemFontOfSize:14.f]
 
 #define kZXMaskTipViewShowCachePath         @"Documents/ZXMaskTipViewShowCache.plist"
+#define kZXMaskTipViewShowLastTimeKey       @"ZXMaskTipViewShowLastTimeKey"
+#define kZXMaskTipViewShowTimeIntervalHour  0
 
 static NSMutableDictionary *cacheDic = nil;
 
@@ -161,12 +163,17 @@ static NSMutableDictionary *cacheDic = nil;
             ZXMaskTipView *maskTipView = [[ZXMaskTipView alloc] initWithFrame:window.frame andMaskTipObjArr:needShowMaskTipObjArr];
             [window addSubview:maskTipView];
         } else {
-            // need delay when cover for convert right frame
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
-                ZXMaskTipView *maskTipView = [[ZXMaskTipView alloc] initWithFrame:window.frame andMaskTipObjArr:needShowMaskTipObjArr];
-                [window addSubview:maskTipView];
-            });
+            NSDate *currentDate = [NSDate date];
+            NSDate *lastDate = [self getLastShowTime];
+            NSTimeInterval timeInterval = [currentDate timeIntervalSinceDate:lastDate];
+            if (timeInterval >= kZXMaskTipViewShowTimeIntervalHour * 60 * 60) {
+                // need delay when cover for convert right frame
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
+                    ZXMaskTipView *maskTipView = [[ZXMaskTipView alloc] initWithFrame:window.frame andMaskTipObjArr:needShowMaskTipObjArr];
+                    [window addSubview:maskTipView];
+                });
+            }
         }
     }
 }
@@ -251,8 +258,12 @@ static NSMutableDictionary *cacheDic = nil;
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if ([fileManager fileExistsAtPath:path]) {
         NSMutableDictionary *cacheDicTemp = [[NSMutableDictionary alloc] initWithContentsOfFile:path];
-        for (NSString *aIdentifier in cacheDicTemp.allKeys) {
-            [cacheDicTemp setObject:@(NO) forKey:aIdentifier];
+        for (NSString *aKey in cacheDicTemp.allKeys) {
+            if ([aKey isEqualToString:kZXMaskTipViewShowLastTimeKey]) {
+                [cacheDicTemp removeObjectForKey:aKey];
+            } else {
+                [cacheDicTemp setObject:@(NO) forKey:aKey];
+            }
         }
         [cacheDicTemp writeToFile:path atomically:YES];
         cacheDic = cacheDicTemp;
@@ -329,6 +340,40 @@ static NSMutableDictionary *cacheDic = nil;
     }
     
     return NO;
+}
+
+/**
+ *  set last show time
+ *
+ *  @param aTime NSDate
+ */
++ (void)setLastShowTime:(NSDate *_Nonnull)aTime {
+    NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:kZXMaskTipViewShowCachePath];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (![fileManager fileExistsAtPath:path]) {
+        [fileManager createFileAtPath:path contents:nil attributes:nil];
+        NSMutableDictionary *emptyCacheDic = [[NSMutableDictionary alloc] init];
+        [emptyCacheDic writeToFile:path atomically:YES];
+    }
+    NSMutableDictionary *cacheDicTemp = [[NSMutableDictionary alloc] initWithContentsOfFile:path];
+    [cacheDicTemp setObject:aTime forKey:kZXMaskTipViewShowLastTimeKey];
+    [cacheDicTemp writeToFile:path atomically:YES];
+    cacheDic = cacheDicTemp;
+}
+
+/**
+ *  get last show time
+ *
+ *  @return last time
+ */
++ (NSDate *)getLastShowTime {
+    NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:kZXMaskTipViewShowCachePath];
+    NSMutableDictionary *cacheDicTemp = [[NSMutableDictionary alloc] initWithContentsOfFile:path];
+    if (cacheDicTemp && cacheDicTemp[kZXMaskTipViewShowLastTimeKey]) {
+        return cacheDicTemp[kZXMaskTipViewShowLastTimeKey];
+    }
+    
+    return [NSDate distantPast];
 }
 
 #pragma mark - Instance method
@@ -474,6 +519,7 @@ static NSMutableDictionary *cacheDic = nil;
     if (aNeedCache) {
         [self.class setCacheDicWithMaskTipObj:_currentMaskTipObj];
     }
+    [self.class setLastShowTime:[NSDate date]];
     [_popTip hide];
     [self removeFromSuperview];
 }
