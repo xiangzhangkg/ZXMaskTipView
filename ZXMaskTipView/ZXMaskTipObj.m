@@ -22,8 +22,8 @@
 #pragma mark = Getter
 
 - (CGRect)frame {
-    if (CGRectEqualToRect(_frame, CGRectNull)) {
-        return [_view.superview convertRect:_view.frame toView:[[UIApplication sharedApplication].delegate window]];
+    if (CGRectEqualToRect(_frame, CGRectNull) && _view.superview) {
+        _frame = [_view.superview convertRect:_view.frame toView:[[UIApplication sharedApplication].delegate window]];
     }
     
     return _frame;

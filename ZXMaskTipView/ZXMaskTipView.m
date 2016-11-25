@@ -169,9 +169,14 @@ static NSMutableDictionary *cacheDic = nil;
             if (timeInterval >= kZXMaskTipViewShowTimeIntervalHour * 60 * 60) {
                 // need delay when cover for convert right frame
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    BOOL disabled = currentMaskTipObj.view.userInteractionEnabled == NO || ([currentMaskTipObj.view isKindOfClass:[UIControl class]] && ((UIControl *)currentMaskTipObj.view).enabled == NO);
+                    CGRect frame = currentMaskTipObj.frame;
                     __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
-                    ZXMaskTipView *maskTipView = [[ZXMaskTipView alloc] initWithFrame:window.frame andMaskTipObjArr:needShowMaskTipObjArr];
-                    [window addSubview:maskTipView];
+                    BOOL frameExist = !CGRectEqualToRect(frame, CGRectNull) && CGRectContainsRect(window.frame, frame);
+                    if (!disabled && frameExist) {
+                        ZXMaskTipView *maskTipView = [[ZXMaskTipView alloc] initWithFrame:window.frame andMaskTipObjArr:needShowMaskTipObjArr];
+                        [window addSubview:maskTipView];
+                    }
                 });
             }
         }
@@ -584,10 +589,8 @@ static NSMutableDictionary *cacheDic = nil;
             return nil;
         } else {
             [self dismissMaskTipViewWithNeedCache:YES];
-            for (ZXMaskTipObj *aMaskTipObj in _maskTipObjArr) {
-                if (CGRectContainsPoint(aMaskTipObj.frame, point)) {
-                    return aMaskTipObj.view;
-                }
+            if (CGRectEqualToRect(_currentMaskTipObj.frame, CGRectNull) || CGRectContainsPoint(_currentMaskTipObj.frame, point)) {
+                return _currentMaskTipObj.view;
             }
         }
     }
