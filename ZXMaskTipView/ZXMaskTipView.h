@@ -131,4 +131,20 @@
  */
 + (void)clearAllCache;
 
+#pragma mark - Set time interval
+
+/**
+ *  set new time interval between two tips, default is one hour
+ *
+ *  @param aTimeInterval time interval
+ */
++ (void)setTimeInterval:(NSTimeInterval)aTimeInterval;
+
+#pragma mark - Clear time interval
+
+/**
+ *  clear time interval
+ */
++ (void)clearTimeInterval;
+
 @end

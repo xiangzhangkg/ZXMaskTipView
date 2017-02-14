@@ -22,8 +22,9 @@
 
 #define kZXMaskTipViewShowCachePath         @"Documents/ZXMaskTipViewShowCache.plist"
 #define kZXMaskTipViewShowLastTimeKey       @"ZXMaskTipViewShowLastTimeKey"
-#define kZXMaskTipViewShowTimeIntervalHour  0
+#define kZXMaskTipViewShowTimeInterval      3600
 
+static NSTimeInterval maskTipViewShowTimeInterval = kZXMaskTipViewShowTimeInterval;
 static NSMutableDictionary *cacheDic = nil;
 
 @interface ZXMaskTipView () {
@@ -166,7 +167,7 @@ static NSMutableDictionary *cacheDic = nil;
             NSDate *currentDate = [NSDate date];
             NSDate *lastDate = [self getLastShowTime];
             NSTimeInterval timeInterval = [currentDate timeIntervalSinceDate:lastDate];
-            if (timeInterval >= kZXMaskTipViewShowTimeIntervalHour * 60 * 60) {
+            if (timeInterval >= maskTipViewShowTimeInterval) {
                 // need delay when cover for convert right frame
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     BOOL disabled = currentMaskTipObj.view.userInteractionEnabled == NO || ([currentMaskTipObj.view isKindOfClass:[UIControl class]] && ((UIControl *)currentMaskTipObj.view).enabled == NO);
@@ -273,6 +274,26 @@ static NSMutableDictionary *cacheDic = nil;
         [cacheDicTemp writeToFile:path atomically:YES];
         cacheDic = cacheDicTemp;
     }
+}
+
+#pragma mark - Set time interval
+
+/**
+ *  set new time interval between two tips, default is one hour
+ *
+ *  @param aTimeInterval time interval
+ */
++ (void)setTimeInterval:(NSTimeInterval)aTimeInterval {
+    maskTipViewShowTimeInterval = aTimeInterval;
+}
+
+#pragma mark - Clear time interval
+
+/**
+ *  clear time interval
+ */
++ (void)clearTimeInterval {
+    [self setTimeInterval:0];
 }
 
 #pragma mark - Private class method
