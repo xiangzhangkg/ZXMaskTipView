@@ -20,9 +20,16 @@
 #define kZXMaskTipViewTipColorDefault_Page      [UIColor whiteColor]
 #define kZXMaskTipViewTipFontDefault_Page       [UIFont systemFontOfSize:14.f]
 
-#define kZXMaskTipViewShowCachePath         @"Documents/ZXMaskTipViewShowCache.plist"
-#define kZXMaskTipViewShowLastTimeKey       @"ZXMaskTipViewShowLastTimeKey"
-#define kZXMaskTipViewShowTimeInterval      3600
+#define kZXMaskTipViewShowCachePath             @"Documents/ZXMaskTipViewShowCache.plist"
+#define kZXMaskTipViewShowLastTimeKey           @"ZXMaskTipViewShowLastTimeKey"
+#define kZXMaskTipViewShowTimeInterval          3600
+
+#define kIsIphone                               (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+#define kScreenWidth                            CGRectGetWidth([UIScreen mainScreen].bounds)
+#define kScreenHeight                           CGRectGetHeight([UIScreen mainScreen].bounds)
+#define kScreenMaxLength                        MAX(kScreenWidth, kScreenHeight)
+#define kIsIphoneX                              (kIsIphone && kScreenMaxLength == 812.f)
+#define kSafeAreaHeight                         34.f
 
 static NSTimeInterval maskTipViewShowTimeInterval = kZXMaskTipViewShowTimeInterval;
 static NSMutableDictionary *cacheDic = nil;
@@ -504,7 +511,7 @@ static NSMutableDictionary *cacheDic = nil;
         //        maxWidth = CGRectGetWidth(_window.frame);
         direction = AMPopTipDirectionUp;
         _popTip.offset = -8.f;
-        _popTip.edgeInsets = UIEdgeInsetsMake(15.f, 32.f, 15.f, 32.f);
+        _popTip.edgeInsets = UIEdgeInsetsMake(15.f, 32.f, 15.f + (kIsIphoneX ? kSafeAreaHeight : 0.f), 32.f);
     } else {
         maxWidth = CGRectGetWidth(_window.frame) / 2.f - 14.f;
         CGFloat top = CGRectGetMinY(frame);
@@ -524,6 +531,9 @@ static NSMutableDictionary *cacheDic = nil;
         } else if (max == right) {
             direction = AMPopTipDirectionRight;
 //            _popTip.bubbleOffset = 25.f;
+        } else {
+            direction = AMPopTipDirectionUp;
+//            _popTip.bubbleOffset = -25.f;
         }
         _popTip.offset = 10.f;
         _popTip.edgeInsets = UIEdgeInsetsMake(7.f, 7.f, 7.f, 7.f);
