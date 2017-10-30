@@ -504,14 +504,11 @@ static NSMutableDictionary *cacheDic = nil;
 - (void)showPopTipWithMaskTipObj {
     CGRect frame = _currentMaskTipObj.frame;
     CGFloat maxWidth;
-    AMPopTipDirection direction;
+    AMPopTipDirection direction = AMPopTipDirectionNone;
     if (_currentIsPage) {
-        // FIXME: a 3rdparty bug, can not place pop and text in center when maxWidth is window width
-        maxWidth = CGRectGetWidth(_window.frame) - 64.f;
-        //        maxWidth = CGRectGetWidth(_window.frame);
-        direction = AMPopTipDirectionUp;
-        _popTip.offset = -8.f;
-        _popTip.edgeInsets = UIEdgeInsetsMake(15.f, 32.f, 15.f + (kIsIphoneX ? kSafeAreaHeight : 0.f), 32.f);
+        direction = AMPopTipDirectionNone;
+        _popTip.edgeInsets = UIEdgeInsetsMake(6.f, 12.f, 6.f + (kIsIphoneX ? kSafeAreaHeight : 0.f), 32.f);
+        maxWidth = CGRectGetWidth(_window.frame) - _popTip.edgeInsets.left - _popTip.edgeInsets.right - 2 * _popTip.padding;
     } else {
         maxWidth = CGRectGetWidth(_window.frame) / 2.f - 14.f;
         CGFloat top = CGRectGetMinY(frame);
@@ -544,6 +541,10 @@ static NSMutableDictionary *cacheDic = nil;
     _popTip.font = _currentMaskTipObj.tipFont ? _currentMaskTipObj.tipFont : _tipFont;
     _popTip.textAlignment = NSTextAlignmentLeft;
     [_popTip showText:_currentMaskTipObj.tip direction:direction maxWidth:maxWidth inView:self fromFrame:frame];
+    if (_currentIsPage) {
+        CGFloat height = (CGRectGetMidY(frame) - CGRectGetMinY(_popTip.frame)) * 2;
+        _popTip.frame = CGRectMake(0.f, CGRectGetMaxY(frame) - height, CGRectGetWidth(_window.frame), height);
+    }
 }
 
 /**
