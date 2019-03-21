@@ -178,10 +178,11 @@ static NSMutableDictionary *cacheDic = nil;
                 // need delay when cover for convert right frame
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     BOOL disabled = currentMaskTipObj.view.userInteractionEnabled == NO || ([currentMaskTipObj.view isKindOfClass:[UIControl class]] && ((UIControl *)currentMaskTipObj.view).enabled == NO);
+                    BOOL hidden = currentMaskTipObj.view.hidden;
                     CGRect frame = currentMaskTipObj.frame;
                     __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
                     BOOL frameExist = !CGRectEqualToRect(frame, CGRectNull) && CGRectContainsRect(window.frame, frame);
-                    if (!disabled && frameExist) {
+                    if (!disabled && !hidden && frameExist) {
                         ZXMaskTipView *maskTipView = [[ZXMaskTipView alloc] initWithFrame:window.frame andMaskTipObjArr:needShowMaskTipObjArr];
                         [window addSubview:maskTipView];
                     }
